@@ -90,7 +90,10 @@ class CharacterListPresenterTest {
         thenIShouldSeeTheseCharacters(SampleMarvelCharacters1 + SampleMarvelCharacters2)
     }
 
-    // todo - pull to refresh
+    // add epoxy recyclerview with grid layout, show thumbnail images with Glide (?)
+    // wire up load next page call from scroll
+    // add total characters available, use that to enable/disable next page loading
+    // add pull-to-refresh
 
     private fun givenTheCharacterListScreenIsOpen() {
         whenIOpenTheCharacterListScreen()

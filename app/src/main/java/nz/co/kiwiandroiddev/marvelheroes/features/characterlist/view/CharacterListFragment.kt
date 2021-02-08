@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
+import io.reactivex.subjects.PublishSubject
 import nz.co.kiwiandroiddev.marvelheroes.MarvelHeroesApplication
 import nz.co.kiwiandroiddev.marvelheroes.R
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation.CharacterListPresenter
@@ -19,7 +20,10 @@ class CharacterListFragment : Fragment(), CharacterListView {
     @Inject
     lateinit var presenter: CharacterListPresenter
 
+    private val viewIntentSubject = PublishSubject.create<CharacterListView.ViewIntent>()
+
     private var textView: TextView? = null
+    private var loadMoreButton: View? = null
 
     private var viewStateDisposable: Disposable? = null
 
@@ -42,6 +46,7 @@ class CharacterListFragment : Fragment(), CharacterListView {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         textView = view.findViewById(R.id.textview_first)
+        loadMoreButton = view.findViewById(R.id.button_first)
     }
 
     override fun onResume() {
@@ -57,11 +62,29 @@ class CharacterListFragment : Fragment(), CharacterListView {
     }
 
     override fun viewIntentStream(): Observable<CharacterListView.ViewIntent> {
-        return Observable.never()
+        return viewIntentSubject
     }
 
     override fun render(viewState: CharacterListView.ViewState) {
         println("Got viewstate: $viewState")
-        textView?.setText(viewState.toString())
+
+        val vsText = when (viewState) {
+            is CharacterListView.ViewState.Content -> {
+                loadMoreButton?.setOnClickListener {
+                    emitViewIntent(CharacterListView.ViewIntent.OnLoadNextPage(
+                        currentCharacterCount = viewState.characters.size
+                    ))
+                }
+
+                viewState.characters.map { it.name }.toString()
+            }
+            else -> viewState.toString()
+        }
+
+        textView?.setText(vsText)
+    }
+
+    private fun emitViewIntent(intent: CharacterListView.ViewIntent) {
+        viewIntentSubject.onNext(intent)
     }
 }
