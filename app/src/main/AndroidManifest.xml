@@ -3,6 +3,7 @@
     package="nz.co.kiwiandroiddev.marvelheroes">
 
     <application
+        android:name=".MarvelHeroesApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"

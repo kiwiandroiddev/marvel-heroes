@@ -17,6 +17,10 @@ class MockCharacterListView : CharacterListView {
         viewStatesRendered.add(viewState)
     }
 
+    fun emitViewIntent(intent: CharacterListView.ViewIntent) {
+        viewIntentStream.onNext(intent)
+    }
+
     val lastViewStateRendered: CharacterListView.ViewState?
         get() = viewStatesRendered.lastOrNull()
 }

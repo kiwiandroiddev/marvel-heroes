@@ -5,4 +5,10 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
+    <fragment
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:name="nz.co.kiwiandroiddev.marvelheroes.features.characterlist.view.CharacterListFragment"
+        android:id="@+id/fragment_character_list" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
