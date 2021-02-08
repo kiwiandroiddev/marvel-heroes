@@ -1,13 +1,15 @@
 package nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation
 
 import io.reactivex.Observable
+import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.domain.model.CharacterId
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.domain.model.CharacterSummary
 
 interface CharacterListView {
 
     sealed class ViewIntent {
         data class OnLoadNextPage(val currentCharacterCount: Int) : ViewIntent()
-        data class OnSelectCharacter(val characterId: String) : ViewIntent()
+        object OnRetryFromError : ViewIntent()
+        data class OnSelectCharacter(val characterId: CharacterId) : ViewIntent()
     }
 
     sealed class ViewState {

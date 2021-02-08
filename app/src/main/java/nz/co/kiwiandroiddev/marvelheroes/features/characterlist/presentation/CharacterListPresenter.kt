@@ -56,6 +56,7 @@ class CharacterListPresenter @Inject constructor(
             when (intent) {
                 is ViewIntent.OnLoadNextPage -> loadNextPage(intent.currentCharacterCount)
                 is ViewIntent.OnSelectCharacter -> Observable.empty()   // todo
+                is ViewIntent.OnRetryFromError -> Observable.empty()   // todo
             }
         }
     }

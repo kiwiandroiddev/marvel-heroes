@@ -3,6 +3,7 @@ package nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.domain.model.CharacterId
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.domain.model.CharacterSummary
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation.CharacterListView.ViewIntent
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation.CharacterListView.ViewState.Content
@@ -18,10 +19,10 @@ class CharacterListPresenterTest {
 
     companion object {
         val SampleMarvelCharacters1 = listOf(
-            CharacterSummary()
+            CharacterSummary(id = CharacterId(1))
         )
         val SampleMarvelCharacters2 = listOf(
-            CharacterSummary()
+            CharacterSummary(id = CharacterId(2))
         )
     }
 
