@@ -8,6 +8,7 @@ import com.airbnb.epoxy.EpoxyAttribute
 import com.airbnb.epoxy.EpoxyHolder
 import com.airbnb.epoxy.EpoxyModelClass
 import com.airbnb.epoxy.EpoxyModelWithHolder
+import com.bumptech.glide.Glide
 import nz.co.kiwiandroiddev.marvelheroes.R
 
 @EpoxyModelClass(layout = R.layout.item_character_summary)
@@ -25,7 +26,11 @@ abstract class CharacterSummaryEpoxyModel : EpoxyModelWithHolder<CharacterSummar
     override fun bind(holder: Holder) {
         holder.container.setOnClickListener { onClickListener() }
         holder.nameTextView.setText(name)
-        // todo thumbnail with image loading library
+
+        Glide.with(holder.thumbnailImageView.context)
+            .load(thumbnailPath)
+            .centerCrop()
+            .into(holder.thumbnailImageView)
     }
 
     class Holder : EpoxyHolder() {

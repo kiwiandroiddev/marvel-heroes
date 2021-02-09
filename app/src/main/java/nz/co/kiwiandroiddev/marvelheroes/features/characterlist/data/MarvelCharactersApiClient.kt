@@ -32,7 +32,7 @@ class MarvelCharactersApiClient @Inject constructor(
         return CharacterSummary(
             id = CharacterId(id),
             name = name,
-            thumbnailImagePath = thumbnail.path
+            thumbnailImagePath = thumbnail.path + "/standard_amazing." + thumbnail.extension
         )
     }
 }

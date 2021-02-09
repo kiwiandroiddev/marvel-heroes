@@ -98,14 +98,16 @@ class CharacterListFragment : Fragment(), CharacterListView {
 
         epoxyRecyclerView!!.withModels {
             when (viewState) {
-                is ViewState.Uninitialized -> { /* show nothing */
+                is ViewState.Uninitialized -> { /* show nothing */ }
+                is ViewState.LoadingFirstPage -> loading {
+                    spanSizeOverride { _, _, _ -> GridColumns }
                 }
-                is ViewState.LoadingFirstPage -> loading {}
                 is ViewState.FirstPageError -> error {
                     errorTitle("Error fetching characters")
                     onActionClickListener {
                         signalIntent(ViewIntent.OnRetryFromError)
                     }
+                    spanSizeOverride { _, _, _ -> GridColumns }
                 }
                 is ViewState.Content -> buildCharacterModels(viewState.characters)
             }

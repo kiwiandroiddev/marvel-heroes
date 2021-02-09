@@ -7,8 +7,8 @@
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
-    android:layout_width="128dp"
-    android:layout_height="128dp">
+    android:layout_width="match_parent"
+    android:layout_height="160dp">
 
     <ImageView
         android:id="@+id/item_character_summary_thumbnail"
@@ -23,12 +23,13 @@
         android:id="@+id/item_character_summary_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:maxLines="1"
+        android:maxLines="2"
         android:ellipsize="end"
         tools:text="Wolverine"
-        android:layout_margin="8dp"
+        android:background="#6000"
+        android:padding="8sp"
         android:gravity="center_horizontal"
-        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title.Inverse"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
