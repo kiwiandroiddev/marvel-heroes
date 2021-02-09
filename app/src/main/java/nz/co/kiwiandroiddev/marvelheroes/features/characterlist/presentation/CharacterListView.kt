@@ -26,12 +26,16 @@ interface CharacterListView {
         // from the domain layer.
         data class Content(
             val characters: List<CharacterSummary>,
-            val showLoadingMoreIndicator: Boolean
+            val showLoadingMoreIndicator: Boolean,
+            val canLoadMore: Boolean
         ) : ViewState()
 
         // Convenience functions
         fun showLoadingMoreIndicator(): Boolean =
             (this as? Content)?.showLoadingMoreIndicator == true
+
+        fun canLoadMore(): Boolean =
+            (this as? Content)?.canLoadMore == true
 
         fun haveAnyCharacters(): Boolean =
             this is Content

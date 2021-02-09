@@ -111,13 +111,7 @@ class CharacterListFragment : Fragment() {
             swipeRefreshLayout?.isRefreshing = false
         }
 
-        if (viewState is ViewState.Content) {
-            scrolledToBottomListener = {
-                signalIntent(ViewIntent.OnLoadNextPage(
-                    currentCharacterCount = viewState.characters.size
-                ))
-            }
-        }
+        maybeListenToScrollToBottomEvents(viewState)
 
         epoxyRecyclerView!!.withModels {
             when (viewState) {
@@ -133,6 +127,22 @@ class CharacterListFragment : Fragment() {
             }
 
             previousViewState = viewState
+        }
+    }
+
+    private fun maybeListenToScrollToBottomEvents(viewState: ViewState) {
+        if (viewState is ViewState.Content) {
+            if (viewState.canLoadMore) {
+                scrolledToBottomListener = {
+                    signalIntent(
+                        ViewIntent.OnLoadNextPage(
+                            currentCharacterCount = viewState.characters.size
+                        )
+                    )
+                }
+            } else {
+                scrolledToBottomListener = {}
+            }
         }
     }
 

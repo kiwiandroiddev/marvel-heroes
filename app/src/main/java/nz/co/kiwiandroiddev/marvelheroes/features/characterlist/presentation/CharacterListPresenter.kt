@@ -1,19 +1,19 @@
 package nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation
 
-    import io.reactivex.Completable
+import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
 import nz.co.kiwiandroiddev.marvelheroes.di.qualifiers.RenderingScheduler
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.domain.model.CharacterId
-import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.domain.model.CharacterSummary
+import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.domain.model.CharacterSummarySubList
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.domain.usecase.GetCharacterSummaries
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation.CharacterListPresenter.PartialViewState.FirstPageError
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation.CharacterListView.ViewIntent
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation.CharacterListView.ViewState
 import javax.inject.Inject
-    import javax.inject.Singleton
+import javax.inject.Singleton
 
 /**
  * @param getCharacterSummaries use case to get a list of marvel characters
@@ -35,10 +35,12 @@ class CharacterListPresenter @Inject constructor(
     private sealed class PartialViewState {
         object LoadingInitialCharacters : PartialViewState()
         object LoadingMoreCharacters : PartialViewState()
-        data class InitialCharactersResult(val characters: List<CharacterSummary>) :
+        data class InitialCharactersResult(val characterSummarySubList: CharacterSummarySubList) :
             PartialViewState()
 
-        data class MoreCharactersResult(val characters: List<CharacterSummary>) : PartialViewState()
+        data class MoreCharactersResult(val characterSummarySubList: CharacterSummarySubList) :
+            PartialViewState()
+
         object FirstPageError : PartialViewState()
     }
 
@@ -78,8 +80,8 @@ class CharacterListPresenter @Inject constructor(
 
     private fun loadFirstPage(): Observable<PartialViewState> {
         return getCharacterSummaries.getCharacters(0, CharactersPerPage)
-            .map { characters ->
-                PartialViewState.InitialCharactersResult(characters) as PartialViewState
+            .map { charactersSublist ->
+                PartialViewState.InitialCharactersResult(charactersSublist) as PartialViewState
             }
             .onErrorReturn { _ -> FirstPageError }
             .toObservable()
@@ -88,8 +90,8 @@ class CharacterListPresenter @Inject constructor(
 
     private fun loadNextPage(currentCharacterCount: Int): ObservableSource<out PartialViewState> {
         return getCharacterSummaries.getCharacters(currentCharacterCount, CharactersPerPage)
-            .map { characters ->
-                PartialViewState.MoreCharactersResult(characters) as PartialViewState
+            .map { charactersSublist ->
+                PartialViewState.MoreCharactersResult(charactersSublist) as PartialViewState
             }
             .onErrorReturn { _ -> FirstPageError }     // todo bug - show inline error in this case
             .toObservable()
@@ -106,22 +108,37 @@ class CharacterListPresenter @Inject constructor(
                 is PartialViewState.LoadingInitialCharacters ->
                     ViewState.LoadingInitialCharacters
 
-                is PartialViewState.InitialCharactersResult ->
+                is PartialViewState.InitialCharactersResult -> {
+                    val characters = partialViewState.characterSummarySubList.characters
+                    val canLoadMore =
+                        characters.size < partialViewState.characterSummarySubList.totalAvailable
+
                     ViewState.Content(
-                        characters = partialViewState.characters,
-                        showLoadingMoreIndicator = false
+                        characters = characters,
+                        showLoadingMoreIndicator = false,
+                        canLoadMore = canLoadMore
                     )
+                }
 
                 is PartialViewState.LoadingMoreCharacters ->
                     (previousViewState as ViewState.Content).copy(
                         showLoadingMoreIndicator = true
                     )
 
-                is PartialViewState.MoreCharactersResult ->
-                    (previousViewState as ViewState.Content).copy(
-                        characters = previousViewState.characters + partialViewState.characters,
-                        showLoadingMoreIndicator = false
-                    )
+                is PartialViewState.MoreCharactersResult -> {
+                    (previousViewState as ViewState.Content).let { prevContent ->
+                        val characters =
+                            prevContent.characters + partialViewState.characterSummarySubList.characters
+                        val canLoadMore =
+                            characters.size < partialViewState.characterSummarySubList.totalAvailable
+
+                        prevContent.copy(
+                            characters = characters,
+                            showLoadingMoreIndicator = false,
+                            canLoadMore = canLoadMore
+                        )
+                    }
+                }
 
                 is FirstPageError ->
                     ViewState.InitialCharactersError

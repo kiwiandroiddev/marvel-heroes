@@ -3,10 +3,11 @@ package nz.co.kiwiandroiddev.marvelheroes.features.characterlist.data
 import io.reactivex.Scheduler
 import io.reactivex.Single
 import nz.co.kiwiandroiddev.marvelheroes.common.data.MarvelCharactersApi
-import nz.co.kiwiandroiddev.marvelheroes.di.qualifiers.NetworkScheduler
 import nz.co.kiwiandroiddev.marvelheroes.common.data.model.Character
+import nz.co.kiwiandroiddev.marvelheroes.di.qualifiers.NetworkScheduler
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.domain.model.CharacterId
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.domain.model.CharacterSummary
+import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.domain.model.CharacterSummarySubList
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.domain.usecase.GetCharacterSummaries
 import javax.inject.Inject
 
@@ -20,10 +21,11 @@ class MarvelCharacterSummaryApiClient @Inject constructor(
     @NetworkScheduler private val networkScheduler: Scheduler
 ) : GetCharacterSummaries {
 
-    override fun getCharacters(offset: Int, limit: Int): Single<List<CharacterSummary>> {
+    override fun getCharacters(offset: Int, limit: Int): Single<CharacterSummarySubList> {
         return api.getCharacters(limit, offset)
             .map { wrapper ->
-                wrapper.data.results.map { it.toDomainModel() }
+                val characterSummaries = wrapper.data.results.map { it.toDomainModel() }
+                CharacterSummarySubList(characterSummaries, wrapper.data.total)
             }
             .subscribeOn(networkScheduler)
     }

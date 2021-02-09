@@ -5,6 +5,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.domain.model.CharacterId
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.domain.model.CharacterSummary
+import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.domain.model.CharacterSummarySubList
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation.CharacterListView.ViewIntent
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation.CharacterListView.ViewState.Content
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation.CharacterListView.ViewState.InitialCharactersError
@@ -127,11 +128,23 @@ class CharacterListPresenterTest {
         thenNavigationIsTriggered(targetCharacterId = SampleMarvelCharacters1.first().id)
     }
 
-    // add total characters available, use that to enable/disable next page loading
-    // @Test
-    // fun `load next page disabled once all characters loaded`() {
-    //     givenLoadingFirstPageWillSucceed(SampleMarvelCharacters1)
-    // }
+    @Test
+    fun `can load more if all available characters are not loaded`() {
+        givenLoadingFirstPageWillSucceed(SampleMarvelCharacters1, totalAvailable = 20)
+
+        whenIOpenTheCharacterListScreen()
+
+        thenThereAreMoreCharactersToLoad()
+    }
+
+    @Test
+    fun `cannot load more once all available characters loaded`() {
+        givenLoadingFirstPageWillSucceed(SampleMarvelCharacters1, totalAvailable = 1)
+
+        whenIOpenTheCharacterListScreen()
+
+        thenThereAreNoMoreCharactersToLoad()
+    }
 
     private fun givenTheCharacterListScreenIsOpen() {
         whenIOpenTheCharacterListScreen()
@@ -145,16 +158,24 @@ class CharacterListPresenterTest {
         mockGetCharacterSummaries.firstPageResult = Single.never()
     }
 
-    private fun givenLoadingFirstPageWillSucceed(characters: List<CharacterSummary>) {
-        mockGetCharacterSummaries.firstPageResult = Single.just(characters)
+    private fun givenLoadingFirstPageWillSucceed(
+        characters: List<CharacterSummary>,
+        totalAvailable: Int = 20
+    ) {
+        mockGetCharacterSummaries.firstPageResult =
+            Single.just(CharacterSummarySubList(characters, totalAvailable))
     }
 
     private fun givenLoadingNextPagesWillNotComplete() {
         mockGetCharacterSummaries.nextPagesResult = Single.never()
     }
 
-    private fun givenLoadingNextPageWillSucceed(characters: List<CharacterSummary>) {
-        mockGetCharacterSummaries.nextPagesResult = Single.just(characters)
+    private fun givenLoadingNextPageWillSucceed(
+        characters: List<CharacterSummary>,
+        totalAvailable: Int = 20
+    ) {
+        mockGetCharacterSummaries.nextPagesResult =
+            Single.just(CharacterSummarySubList(characters, totalAvailable))
     }
 
     private fun whenIOpenTheCharacterListScreen() {
@@ -187,9 +208,18 @@ class CharacterListPresenterTest {
             .isExactlyInstanceOf(InitialCharactersError::class.java)
     }
 
-    private fun thenIShouldSeeTheseCharacters(characters: List<CharacterSummary>) {
+    private fun thenIShouldSeeTheseCharacters(
+        characters: List<CharacterSummary>,
+        canLoadMore: Boolean = true
+    ) {
         assertThat(mockView.lastViewStateRendered)
-            .isEqualTo(Content(characters = characters, showLoadingMoreIndicator = false))
+            .isEqualTo(
+                Content(
+                    characters = characters,
+                    showLoadingMoreIndicator = false,
+                    canLoadMore = canLoadMore
+                )
+            )
     }
 
     private fun thenISeeThatMoreCharactersAreLoading() {
@@ -199,5 +229,13 @@ class CharacterListPresenterTest {
 
     private fun thenNavigationIsTriggered(targetCharacterId: CharacterId) {
         assertThat(mockNavigator.lastCalledWithCharacterId).isEqualTo(targetCharacterId)
+    }
+
+    private fun thenThereAreMoreCharactersToLoad() {
+        assertThat((mockView.lastViewStateRendered as? Content)?.canLoadMore).isTrue
+    }
+
+    private fun thenThereAreNoMoreCharactersToLoad() {
+        assertThat((mockView.lastViewStateRendered as? Content)?.canLoadMore).isFalse
     }
 }
