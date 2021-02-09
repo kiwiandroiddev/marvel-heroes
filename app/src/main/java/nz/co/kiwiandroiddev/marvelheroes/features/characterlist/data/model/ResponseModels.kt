@@ -15,10 +15,20 @@ data class CharacterDataContainer(
 data class Character(
     val id: Int,
     val name: String,
-    val thumbnail: Image
+    val description: String,
+    val thumbnail: Image,
+    val comics: ComicList
 )
 
 data class Image(
     val path: String,
     val extension: String
+)
+
+data class ComicList(
+    val items: List<ComicSummary>
+)
+
+data class ComicSummary(
+    val name: String
 )

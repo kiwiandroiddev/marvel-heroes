@@ -31,7 +31,10 @@ class MarvelCharacterDetailsApiClient @Inject constructor(
     private fun Character.toDomainModel(): CharacterDetails {
         return CharacterDetails(
             id = CharacterId(this.id),
-            name = this.name
+            name = this.name,
+            description = this.description,
+            comicsAppearedIn = this.comics.items.map { it.name },
+            imagePath = thumbnail.path + "/detail." + thumbnail.extension
         )
     }
 
