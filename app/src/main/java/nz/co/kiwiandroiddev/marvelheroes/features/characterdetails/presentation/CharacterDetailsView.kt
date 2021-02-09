@@ -6,6 +6,10 @@ import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.domain.model.Cha
 
 interface CharacterDetailsView {
 
+    // Todo it's a bit weird to pass the character ID again with each intent. This is because
+    //  presenters are stateless. An improvement to be made here could be to scope the presenter
+    //  by character ID i.e. request a presenter factory/provider from the DI container,
+    //  passing the character ID as an argument.
     sealed class ViewIntent {
         data class OnRetryFromError(val characterId: CharacterId) : ViewIntent()
         data class OnRefresh(val characterId: CharacterId) : ViewIntent()

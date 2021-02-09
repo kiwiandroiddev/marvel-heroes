@@ -1,7 +1,7 @@
-package nz.co.kiwiandroiddev.marvelheroes.features.characterlist.data
+package nz.co.kiwiandroiddev.marvelheroes.common.data
 
 import io.reactivex.Single
-import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.data.model.CharacterDataWrapper
+import nz.co.kiwiandroiddev.marvelheroes.common.data.model.CharacterDataWrapper
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query

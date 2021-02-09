@@ -1,1 +1,4 @@
 /build
+
+# Contains API keys etc.
+gradle.properties

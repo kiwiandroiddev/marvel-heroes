@@ -2,11 +2,11 @@ package nz.co.kiwiandroiddev.marvelheroes.features.characterdetails.data
 
 import io.reactivex.Scheduler
 import io.reactivex.Single
+import nz.co.kiwiandroiddev.marvelheroes.common.data.MarvelCharactersApi
+import nz.co.kiwiandroiddev.marvelheroes.common.data.model.Character
 import nz.co.kiwiandroiddev.marvelheroes.di.qualifiers.NetworkScheduler
 import nz.co.kiwiandroiddev.marvelheroes.features.characterdetails.domain.model.CharacterDetails
 import nz.co.kiwiandroiddev.marvelheroes.features.characterdetails.domain.usecase.GetCharacterDetails
-import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.data.MarvelCharactersApi
-import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.data.model.Character
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.domain.model.CharacterId
 import javax.inject.Inject
 

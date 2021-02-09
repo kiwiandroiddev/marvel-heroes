@@ -29,7 +29,7 @@ interface CharacterListView {
             val showLoadingMoreIndicator: Boolean
         ) : ViewState()
 
-        // Convenience function
+        // Convenience functions
         fun showLoadingMoreIndicator(): Boolean =
             (this as? Content)?.showLoadingMoreIndicator == true
 

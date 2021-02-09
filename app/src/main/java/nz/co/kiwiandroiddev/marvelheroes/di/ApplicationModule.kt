@@ -6,6 +6,7 @@ import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import nz.co.kiwiandroiddev.marvelheroes.BuildConfig
+import nz.co.kiwiandroiddev.marvelheroes.common.data.MarvelCharactersApi
 import nz.co.kiwiandroiddev.marvelheroes.common.data.http.AuthorizationInterceptor
 import nz.co.kiwiandroiddev.marvelheroes.di.qualifiers.NetworkScheduler
 import nz.co.kiwiandroiddev.marvelheroes.di.qualifiers.PrivateApiKey
@@ -13,8 +14,7 @@ import nz.co.kiwiandroiddev.marvelheroes.di.qualifiers.PublicApiKey
 import nz.co.kiwiandroiddev.marvelheroes.di.qualifiers.RenderingScheduler
 import nz.co.kiwiandroiddev.marvelheroes.features.characterdetails.data.MarvelCharacterDetailsApiClient
 import nz.co.kiwiandroiddev.marvelheroes.features.characterdetails.domain.usecase.GetCharacterDetails
-import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.data.MarvelCharactersApi
-import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.data.MarvelCharactersApiClient
+import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.data.MarvelCharacterSummaryApiClient
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.domain.usecase.GetCharacterSummaries
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation.CharacterListNavigator
 import nz.co.kiwiandroiddev.marvelheroes.navigation.NavigationDispatcher
@@ -28,17 +28,15 @@ import javax.inject.Singleton
 @Module
 class ApplicationModule {
 
-    val baseUrl = "https://gateway.marvel.com/v1/public/"      // todo move to config
+    private val baseUrl = "https://gateway.marvel.com/v1/public/"
 
     @Provides
     @PublicApiKey
-    fun provideDeveloperPublicApiKey() =
-        "bb205b7c46c1f14b9a595a21ba502670"       // todo get from gradle properties
+    fun provideDeveloperPublicApiKey() = BuildConfig.API_KEY_PUBLIC
 
     @Provides
     @PrivateApiKey
-    fun provideDeveloperPrivateApiKey() =
-        "d7f9fd66fa0bdbec1e651772612a2068e626796e"       // todo get from gradle properties
+    fun provideDeveloperPrivateApiKey() = BuildConfig.API_KEY_PRIVATE
 
     @Provides
     @Singleton
@@ -47,7 +45,7 @@ class ApplicationModule {
 
     @Provides
     @Singleton
-    fun provideGetCharacterSummaries(apiClient: MarvelCharactersApiClient): GetCharacterSummaries =
+    fun provideGetCharacterSummaries(apiClient: MarvelCharacterSummaryApiClient): GetCharacterSummaries =
         apiClient
 
     @Provides

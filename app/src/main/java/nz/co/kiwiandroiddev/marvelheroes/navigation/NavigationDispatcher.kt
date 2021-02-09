@@ -11,6 +11,8 @@ class NavigationDispatcher @Inject constructor(
 ) : CharacterListNavigator {
 
     override fun navigateToCharacter(characterId: CharacterId) {
+        // We want to crash the app if navigation is somehow triggered with no MainActivity
+        // registered - it means there's a programming error...
         mainActivityProvider.mainActivity!!.navigateToCharacter(characterId)
     }
 

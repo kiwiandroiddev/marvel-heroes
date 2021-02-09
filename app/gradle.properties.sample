@@ -1,0 +1,5 @@
+# Sign up for developer API keys at https://developer.marvel.com, insert them here, then rename this
+# file to gradle.properties
+
+MarvelApiKeyPrivate="YOUR_PUBLIC_KEY_HERE"
+MarvelApiKeyPublic="YOUR_PRIVATE_KEY_HERE"

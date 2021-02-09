@@ -1,4 +1,4 @@
-package nz.co.kiwiandroiddev.marvelheroes.features.characterlist.data.model
+package nz.co.kiwiandroiddev.marvelheroes.common.data.model
 
 data class CharacterDataWrapper(
     val data: CharacterDataContainer
