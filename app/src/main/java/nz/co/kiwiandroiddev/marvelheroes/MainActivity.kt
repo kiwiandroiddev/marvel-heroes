@@ -26,19 +26,19 @@ class MainActivity : AppCompatActivity(), CharacterListNavigator,
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
         injectDependencies()
-
         supportFragmentManager.addOnBackStackChangedListener(this)
-
         fragmentContainerView = findViewById(R.id.fragment_container_view)
-
         if (savedInstanceState == null) {
-            supportFragmentManager.commit {
-                setReorderingAllowed(true)
-                add<CharacterListFragment>(R.id.fragment_container_view)
-            }
+            setupInitialScreen()
         }
-
         displayHomeAsUpIfNeeded()
+    }
+
+    private fun setupInitialScreen() {
+        supportFragmentManager.commit {
+            setReorderingAllowed(true)
+            add<CharacterListFragment>(R.id.fragment_container_view)
+        }
     }
 
     private fun injectDependencies() {

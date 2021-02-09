@@ -13,7 +13,6 @@ class MockCharacterListView : CharacterListView {
     }
 
     override fun render(viewState: CharacterListView.ViewState) {
-        println("got viewState: $viewState")
         viewStatesRendered.add(viewState)
     }
 

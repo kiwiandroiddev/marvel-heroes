@@ -2,8 +2,9 @@
     <string name="app_name">Marvel Heroes</string>
     <string name="retry">Retry</string>
 
-    <!-- Character details screen -->
+    <string name="character_list_screen_title">Marvel Heroes</string>
+    <string name="character_list_error_title">Error fetching characters</string>
+
     <string name="character_details_screen_title">Character Bio</string>
     <string name="character_details_appears_in">Appears In</string>
-    <string name="character_list_screen_title">Marvel Heroes</string>
 </resources>

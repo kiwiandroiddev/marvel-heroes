@@ -59,15 +59,13 @@ class CharacterListFragment : Fragment() {
             layoutManager = GridLayoutManager(context, NumGridColumns)
 
             addOnScrollListener(object : OnScrolledToBottomListener() {
-                override fun onScrolledToBottom() {
-                    scrolledToBottomListener()
-                }
+                override fun onScrolledToBottom() { scrolledToBottomListener() }
             })
         }
     }
 
     private fun setupSwipeRefreshLayout() {
-        swipeRefreshLayout!!.setOnRefreshListener {
+        swipeRefreshLayout?.setOnRefreshListener {
             signalIntent(ViewIntent.OnRefresh)
         }
     }
@@ -79,15 +77,6 @@ class CharacterListFragment : Fragment() {
         viewStateDisposable = viewModel?.viewStateSubject?.subscribe(::render)
     }
 
-    override fun onStop() {
-        super.onStop()
-
-        viewModel = null
-        if (viewStateDisposable?.isDisposed == false) {
-            viewStateDisposable?.dispose()
-        }
-    }
-
     override fun onResume() {
         super.onResume()
         setActionBarTitle()
@@ -97,13 +86,20 @@ class CharacterListFragment : Fragment() {
         (activity as? AppCompatActivity)?.supportActionBar?.setTitle(R.string.character_list_screen_title)
     }
 
+    override fun onStop() {
+        super.onStop()
+
+        viewModel = null
+        if (viewStateDisposable?.isDisposed == false) {
+            viewStateDisposable?.dispose()
+        }
+    }
+
     private fun signalIntent(intent: ViewIntent) {
         viewModel?.signalIntent(intent)
     }
 
     private fun render(viewState: ViewState) {
-        println("ZZZ render viewstate: $viewState, previousViewState = $previousViewState")
-
         val didStopLoadingFirstPage = (previousViewState == ViewState.LoadingInitialCharacters &&
             viewState != ViewState.LoadingInitialCharacters)
 
@@ -147,7 +143,6 @@ class CharacterListFragment : Fragment() {
     }
 
     private fun EpoxyController.buildLoadingModel(previousViewState: ViewState?) {
-        println("ZZZ in building loading model, prev view state = $previousViewState")
         if (previousViewState?.haveAnyCharacters() == false) {
             loading {
                 spanSizeOverride { _, _, _ -> NumGridColumns }
@@ -157,7 +152,7 @@ class CharacterListFragment : Fragment() {
 
     private fun EpoxyController.buildErrorModel() {
         error {
-            errorTitle("Error fetching characters")
+            errorTitle(getString(R.string.character_list_error_title))
             onActionClickListener {
                 signalIntent(ViewIntent.OnRetryFromError)
             }

@@ -13,7 +13,6 @@ class MockCharacterDetailsView : CharacterDetailsView {
     }
 
     override fun render(viewState: CharacterDetailsView.ViewState) {
-        println("got viewState: $viewState")
         viewStatesRendered.add(viewState)
     }
 

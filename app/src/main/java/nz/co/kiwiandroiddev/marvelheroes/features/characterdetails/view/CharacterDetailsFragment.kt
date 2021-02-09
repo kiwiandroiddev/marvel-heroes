@@ -68,7 +68,7 @@ class CharacterDetailsFragment : Fragment() {
     }
 
     private fun setupSwipeRefreshLayout() {
-        swipeRefreshLayout!!.setOnRefreshListener {
+        swipeRefreshLayout?.setOnRefreshListener {
             signalIntent(ViewIntent.OnRefresh(getCharacterId()))
         }
     }
@@ -112,9 +112,7 @@ class CharacterDetailsFragment : Fragment() {
     }
 
     fun render(viewState: ViewState) {
-        println("ZZZ render viewstate: $viewState")
-
-        epoxyRecyclerView!!.withModels {
+        epoxyRecyclerView?.withModels {
             when (viewState) {
                 is ViewState.Loading -> loading { }
                 is ViewState.Error -> error {
