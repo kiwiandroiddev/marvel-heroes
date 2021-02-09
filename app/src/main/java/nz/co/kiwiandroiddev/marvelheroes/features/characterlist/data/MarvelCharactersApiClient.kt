@@ -17,8 +17,7 @@ import javax.inject.Inject
 class MarvelCharactersApiClient @Inject constructor(
     private val api: MarvelCharactersApi,
     @NetworkScheduler private val networkScheduler: Scheduler
-) :
-    GetCharacterSummaries {
+) : GetCharacterSummaries {
 
     override fun getCharacters(offset: Int, limit: Int): Single<List<CharacterSummary>> {
         return api.getCharacters(limit, offset)

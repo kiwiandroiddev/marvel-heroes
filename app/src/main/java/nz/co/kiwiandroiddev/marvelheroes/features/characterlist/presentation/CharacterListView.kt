@@ -9,13 +9,15 @@ interface CharacterListView {
     sealed class ViewIntent {
         data class OnLoadNextPage(val currentCharacterCount: Int) : ViewIntent()
         object OnRetryFromError : ViewIntent()
+        object OnRefresh : ViewIntent()
+
         data class OnSelectCharacter(val characterId: CharacterId) : ViewIntent()
     }
 
     sealed class ViewState {
         object Uninitialized : ViewState()
-        object LoadingFirstPage : ViewState()
-        object FirstPageError : ViewState()
+        object LoadingInitialCharacters : ViewState()
+        object InitialCharactersError : ViewState()
 
         // store some meta-data with character list - total size. Add calculated property
         // 'hasMore', view can use this to know whether to ask for next page on scroll to the end.
@@ -26,6 +28,13 @@ interface CharacterListView {
             val characters: List<CharacterSummary>,
             val showLoadingMoreIndicator: Boolean
         ) : ViewState()
+
+        // Convenience function
+        fun showLoadingMoreIndicator(): Boolean =
+            (this as? Content)?.showLoadingMoreIndicator == true
+
+        fun haveAnyCharacters(): Boolean =
+            this is Content
     }
 
     fun viewIntentStream(): Observable<ViewIntent>

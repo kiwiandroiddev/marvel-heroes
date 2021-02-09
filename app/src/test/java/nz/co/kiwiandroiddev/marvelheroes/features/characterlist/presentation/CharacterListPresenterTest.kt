@@ -7,8 +7,8 @@ import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.domain.model.Cha
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.domain.model.CharacterSummary
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation.CharacterListView.ViewIntent
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation.CharacterListView.ViewState.Content
-import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation.CharacterListView.ViewState.FirstPageError
-import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation.CharacterListView.ViewState.LoadingFirstPage
+import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation.CharacterListView.ViewState.InitialCharactersError
+import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation.CharacterListView.ViewState.LoadingInitialCharacters
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation.mocks.MockCharacterListView
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation.mocks.MockGetCharacterSummaries
 import org.assertj.core.api.Assertions.assertThat
@@ -70,6 +70,28 @@ class CharacterListPresenterTest {
     }
 
     @Test
+    fun `show first page characters after retry`() {
+        givenLoadingFirstPageWillFail()
+        givenTheCharacterListScreenIsOpen()
+        givenLoadingFirstPageWillSucceed(SampleMarvelCharacters1)
+
+        whenIRetry()
+
+        thenIShouldSeeTheseCharacters(SampleMarvelCharacters1)
+    }
+
+    @Test
+    fun `shows updated first page on refresh`() {
+        givenLoadingFirstPageWillSucceed(SampleMarvelCharacters1)
+        givenTheCharacterListScreenIsOpen()
+        givenLoadingFirstPageWillSucceed(SampleMarvelCharacters2)
+
+        whenIRefresh()
+
+        thenIShouldSeeTheseCharacters(SampleMarvelCharacters2)
+    }
+
+    @Test
     fun `load next page intent shows loading more indicator`() {
         givenLoadingFirstPageWillSucceed(SampleMarvelCharacters1)
         givenLoadingNextPagesWillNotComplete()
@@ -91,10 +113,7 @@ class CharacterListPresenterTest {
         thenIShouldSeeTheseCharacters(SampleMarvelCharacters1 + SampleMarvelCharacters2)
     }
 
-    // add epoxy recyclerview with grid layout, show thumbnail images with Glide (?)
-    // wire up load next page call from scroll
     // add total characters available, use that to enable/disable next page loading
-    // add pull-to-refresh
 
     private fun givenTheCharacterListScreenIsOpen() {
         whenIOpenTheCharacterListScreen()
@@ -124,18 +143,26 @@ class CharacterListPresenterTest {
         viewStateDisposable = presenter.attachView(mockView)
     }
 
+    private fun whenIRetry() {
+        mockView.emitViewIntent(ViewIntent.OnRetryFromError)
+    }
+
+    private fun whenIRefresh() {
+        mockView.emitViewIntent(ViewIntent.OnRefresh)
+    }
+
     private fun whenIRequestTheNextPage(currentCharacterCount: Int) {
         mockView.emitViewIntent(ViewIntent.OnLoadNextPage(currentCharacterCount))
     }
 
     private fun thenIShouldSeeTheFirstPageLoading() {
         assertThat(mockView.lastViewStateRendered)
-            .isExactlyInstanceOf(LoadingFirstPage::class.java)
+            .isExactlyInstanceOf(LoadingInitialCharacters::class.java)
     }
 
     private fun thenIShouldSeeAFirstPageLoadingError() {
         assertThat(mockView.lastViewStateRendered)
-            .isExactlyInstanceOf(FirstPageError::class.java)
+            .isExactlyInstanceOf(InitialCharactersError::class.java)
     }
 
     private fun thenIShouldSeeTheseCharacters(characters: List<CharacterSummary>) {
