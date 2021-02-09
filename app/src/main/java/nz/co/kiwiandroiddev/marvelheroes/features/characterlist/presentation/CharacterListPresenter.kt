@@ -1,24 +1,29 @@
 package nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation
 
+    import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
 import nz.co.kiwiandroiddev.marvelheroes.di.qualifiers.RenderingScheduler
+import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.domain.model.CharacterId
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.domain.model.CharacterSummary
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.domain.usecase.GetCharacterSummaries
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation.CharacterListPresenter.PartialViewState.FirstPageError
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation.CharacterListView.ViewIntent
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation.CharacterListView.ViewState
 import javax.inject.Inject
+    import javax.inject.Singleton
 
 /**
  * @param getCharacterSummaries use case to get a list of marvel characters
  * @param renderingScheduler scheduler used for calls to the view's render function (e.g.
  *  some kind of UI thread)
  */
+@Singleton
 class CharacterListPresenter @Inject constructor(
     private val getCharacterSummaries: GetCharacterSummaries,
+    private val navigator: CharacterListNavigator,
     @RenderingScheduler private val renderingScheduler: Scheduler
 ) {
 
@@ -30,7 +35,9 @@ class CharacterListPresenter @Inject constructor(
     private sealed class PartialViewState {
         object LoadingInitialCharacters : PartialViewState()
         object LoadingMoreCharacters : PartialViewState()
-        data class InitialCharactersResult(val characters: List<CharacterSummary>) : PartialViewState()
+        data class InitialCharactersResult(val characters: List<CharacterSummary>) :
+            PartialViewState()
+
         data class MoreCharactersResult(val characters: List<CharacterSummary>) : PartialViewState()
         object FirstPageError : PartialViewState()
     }
@@ -57,10 +64,16 @@ class CharacterListPresenter @Inject constructor(
             when (intent) {
                 is ViewIntent.OnLoadNextPage -> loadNextPage(intent.currentCharacterCount)
                 is ViewIntent.OnRetryFromError -> loadFirstPage()
-                is ViewIntent.OnSelectCharacter -> Observable.empty()   // todo
+                is ViewIntent.OnSelectCharacter -> navigateToCharacter(intent.characterId)
                 is ViewIntent.OnRefresh -> loadFirstPage()
             }
         }
+    }
+
+    private fun navigateToCharacter(characterId: CharacterId): Observable<out PartialViewState> {
+        return Completable.fromAction {
+            navigator.navigateToCharacter(characterId)
+        }.toObservable()
     }
 
     private fun loadFirstPage(): Observable<PartialViewState> {
@@ -115,6 +128,5 @@ class CharacterListPresenter @Inject constructor(
             }
         }
     }
-
 }
 

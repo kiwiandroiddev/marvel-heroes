@@ -35,13 +35,12 @@ class CharacterListFragment : Fragment(), CharacterListView {
     lateinit var presenter: CharacterListPresenter
 
     private val viewIntentSubject = PublishSubject.create<ViewIntent>()
+    private var previousViewState: ViewState? = null
+    private var viewStateDisposable: Disposable? = null
 
     private var epoxyRecyclerView: EpoxyRecyclerView? = null
     private var swipeRefreshLayout: SwipeRefreshLayout? = null
-
     private var scrolledToBottomListener: () -> Unit = {}
-    private var previousViewState: ViewState? = null
-    private var viewStateDisposable: Disposable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,7 +48,7 @@ class CharacterListFragment : Fragment(), CharacterListView {
     }
 
     private fun injectDependencies() {
-        (requireContext().applicationContext as MarvelHeroesApplication).inject(this)
+        (requireContext().applicationContext as MarvelHeroesApplication).appComponent.inject(this)
     }
 
     override fun onCreateView(
@@ -67,7 +66,7 @@ class CharacterListFragment : Fragment(), CharacterListView {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        setupRecyclerView(activity!!)
+        setupRecyclerView(requireActivity())
         setupSwipeRefreshLayout()
     }
 

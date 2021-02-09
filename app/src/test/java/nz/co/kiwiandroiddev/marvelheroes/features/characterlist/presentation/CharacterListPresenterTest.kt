@@ -9,6 +9,7 @@ import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation.Cha
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation.CharacterListView.ViewState.Content
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation.CharacterListView.ViewState.InitialCharactersError
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation.CharacterListView.ViewState.LoadingInitialCharacters
+import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation.mocks.MockCharacterListNavigator
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation.mocks.MockCharacterListView
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation.mocks.MockGetCharacterSummaries
 import org.assertj.core.api.Assertions.assertThat
@@ -28,6 +29,7 @@ class CharacterListPresenterTest {
 
     lateinit var mockGetCharacterSummaries: MockGetCharacterSummaries
     lateinit var mockView: MockCharacterListView
+    lateinit var mockNavigator: MockCharacterListNavigator
     lateinit var presenter: CharacterListPresenter
 
     var viewStateDisposable: Disposable? = null
@@ -36,8 +38,10 @@ class CharacterListPresenterTest {
     fun setUp() {
         mockGetCharacterSummaries = MockGetCharacterSummaries()
         mockView = MockCharacterListView()
+        mockNavigator = MockCharacterListNavigator()
         presenter = CharacterListPresenter(
             getCharacterSummaries = mockGetCharacterSummaries,
+            navigator = mockNavigator,
             renderingScheduler = Schedulers.trampoline()
         )
     }
@@ -113,7 +117,21 @@ class CharacterListPresenterTest {
         thenIShouldSeeTheseCharacters(SampleMarvelCharacters1 + SampleMarvelCharacters2)
     }
 
+    @Test
+    fun `selecting a character triggers navigation`() {
+        givenLoadingFirstPageWillSucceed(SampleMarvelCharacters1)
+        givenTheCharacterListScreenIsOpen()
+
+        whenISelectACharacter(id = SampleMarvelCharacters1.first().id)
+
+        thenNavigationIsTriggered(targetCharacterId = SampleMarvelCharacters1.first().id)
+    }
+
     // add total characters available, use that to enable/disable next page loading
+    // @Test
+    // fun `load next page disabled once all characters loaded`() {
+    //     givenLoadingFirstPageWillSucceed(SampleMarvelCharacters1)
+    // }
 
     private fun givenTheCharacterListScreenIsOpen() {
         whenIOpenTheCharacterListScreen()
@@ -151,6 +169,10 @@ class CharacterListPresenterTest {
         mockView.emitViewIntent(ViewIntent.OnRefresh)
     }
 
+    private fun whenISelectACharacter(id: CharacterId) {
+        mockView.emitViewIntent(ViewIntent.OnSelectCharacter(id))
+    }
+
     private fun whenIRequestTheNextPage(currentCharacterCount: Int) {
         mockView.emitViewIntent(ViewIntent.OnLoadNextPage(currentCharacterCount))
     }
@@ -173,5 +195,9 @@ class CharacterListPresenterTest {
     private fun thenISeeThatMoreCharactersAreLoading() {
         assertThat((mockView.lastViewStateRendered as? Content)?.showLoadingMoreIndicator)
             .isTrue
+    }
+
+    private fun thenNavigationIsTriggered(targetCharacterId: CharacterId) {
+        assertThat(mockNavigator.lastCalledWithCharacterId).isEqualTo(targetCharacterId)
     }
 }

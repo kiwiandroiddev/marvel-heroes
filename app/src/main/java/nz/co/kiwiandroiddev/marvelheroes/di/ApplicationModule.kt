@@ -11,9 +11,13 @@ import nz.co.kiwiandroiddev.marvelheroes.di.qualifiers.NetworkScheduler
 import nz.co.kiwiandroiddev.marvelheroes.di.qualifiers.PrivateApiKey
 import nz.co.kiwiandroiddev.marvelheroes.di.qualifiers.PublicApiKey
 import nz.co.kiwiandroiddev.marvelheroes.di.qualifiers.RenderingScheduler
+import nz.co.kiwiandroiddev.marvelheroes.features.characterdetails.data.MarvelCharacterDetailsApiClient
+import nz.co.kiwiandroiddev.marvelheroes.features.characterdetails.domain.usecase.GetCharacterDetails
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.data.MarvelCharactersApi
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.data.MarvelCharactersApiClient
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.domain.usecase.GetCharacterSummaries
+import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation.CharacterListNavigator
+import nz.co.kiwiandroiddev.marvelheroes.navigation.NavigationDispatcher
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -27,18 +31,28 @@ class ApplicationModule {
     val baseUrl = "https://gateway.marvel.com/v1/public/"      // todo move to config
 
     @Provides
-    @Singleton
     @PublicApiKey
-    fun provideDeveloperPublicApiKey() = "bb205b7c46c1f14b9a595a21ba502670"       // todo get from gradle properties
+    fun provideDeveloperPublicApiKey() =
+        "bb205b7c46c1f14b9a595a21ba502670"       // todo get from gradle properties
+
+    @Provides
+    @PrivateApiKey
+    fun provideDeveloperPrivateApiKey() =
+        "d7f9fd66fa0bdbec1e651772612a2068e626796e"       // todo get from gradle properties
 
     @Provides
     @Singleton
-    @PrivateApiKey
-    fun provideDeveloperPrivateApiKey() = "d7f9fd66fa0bdbec1e651772612a2068e626796e"       // todo get from gradle properties
+    fun provideCharacterListNavigator(navigationDispatcher: NavigationDispatcher): CharacterListNavigator =
+        navigationDispatcher
 
     @Provides
     @Singleton
     fun provideGetCharacterSummaries(apiClient: MarvelCharactersApiClient): GetCharacterSummaries =
+        apiClient
+
+    @Provides
+    @Singleton
+    fun provideGetCharacterDetails(apiClient: MarvelCharacterDetailsApiClient): GetCharacterDetails =
         apiClient
 
     @Provides
@@ -82,5 +96,4 @@ class ApplicationModule {
     @Singleton
     @NetworkScheduler
     fun provideNetworkScheduler(): Scheduler = Schedulers.io()
-
 }
