@@ -3,7 +3,7 @@ package nz.co.kiwiandroiddev.marvelheroes.di
 import dagger.Component
 import nz.co.kiwiandroiddev.marvelheroes.MainActivity
 import nz.co.kiwiandroiddev.marvelheroes.features.characterdetails.view.CharacterDetailsFragment
-import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.view.CharacterListFragment
+import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.view.CharacterListViewModel
 import javax.inject.Singleton
 
 @Singleton
@@ -15,7 +15,7 @@ import javax.inject.Singleton
 interface ApplicationComponent {
 
     fun inject(target: MainActivity)
-    fun inject(target: CharacterListFragment)
+    fun inject(target: CharacterListViewModel)
     fun inject(target: CharacterDetailsFragment)
 
 }

@@ -7,50 +7,33 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.airbnb.epoxy.EpoxyController
 import com.airbnb.epoxy.EpoxyRecyclerView
-import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
-import io.reactivex.subjects.PublishSubject
-import nz.co.kiwiandroiddev.marvelheroes.MarvelHeroesApplication
 import nz.co.kiwiandroiddev.marvelheroes.R
 import nz.co.kiwiandroiddev.marvelheroes.common.epoxy.error
 import nz.co.kiwiandroiddev.marvelheroes.common.epoxy.loading
+import nz.co.kiwiandroiddev.marvelheroes.common.widget.OnScrolledToBottomListener
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.domain.model.CharacterSummary
-import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation.CharacterListPresenter
-import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation.CharacterListView
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation.CharacterListView.ViewIntent
 import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation.CharacterListView.ViewState
-import javax.inject.Inject
 
-class CharacterListFragment : Fragment(), CharacterListView {
+class CharacterListFragment : Fragment() {
 
     companion object {
         private const val GridColumns = 2
     }
 
-    @Inject
-    lateinit var presenter: CharacterListPresenter
-
-    private val viewIntentSubject = PublishSubject.create<ViewIntent>()
+    private var viewModel: CharacterListViewModel? = null
     private var previousViewState: ViewState? = null
     private var viewStateDisposable: Disposable? = null
 
     private var epoxyRecyclerView: EpoxyRecyclerView? = null
     private var swipeRefreshLayout: SwipeRefreshLayout? = null
     private var scrolledToBottomListener: () -> Unit = {}
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        injectDependencies()
-    }
-
-    private fun injectDependencies() {
-        (requireContext().applicationContext as MarvelHeroesApplication).appComponent.inject(this)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -75,12 +58,9 @@ class CharacterListFragment : Fragment(), CharacterListView {
         epoxyRecyclerView?.apply {
             layoutManager = GridLayoutManager(context, GridColumns)
 
-            addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                    super.onScrollStateChanged(recyclerView, newState)
-                    if (!recyclerView.canScrollVertically(1) && newState == RecyclerView.SCROLL_STATE_IDLE) {
-                        scrolledToBottomListener()
-                    }
+            addOnScrollListener(object : OnScrolledToBottomListener() {
+                override fun onScrolledToBottom() {
+                    scrolledToBottomListener()
                 }
             })
         }
@@ -92,9 +72,24 @@ class CharacterListFragment : Fragment(), CharacterListView {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+
+        viewModel = ViewModelProvider(this).get(CharacterListViewModel::class.java)
+        viewStateDisposable = viewModel?.viewStateSubject?.subscribe(::render)
+    }
+
+    override fun onStop() {
+        super.onStop()
+
+        viewModel = null
+        if (viewStateDisposable?.isDisposed == false) {
+            viewStateDisposable?.dispose()
+        }
+    }
+
     override fun onResume() {
         super.onResume()
-        viewStateDisposable = presenter.attachView(this)
         setActionBarTitle()
     }
 
@@ -102,23 +97,11 @@ class CharacterListFragment : Fragment(), CharacterListView {
         (activity as? AppCompatActivity)?.supportActionBar?.setTitle(R.string.character_list_screen_title)
     }
 
-    override fun onPause() {
-        super.onPause()
-        if (viewStateDisposable?.isDisposed == false) {
-            viewStateDisposable?.dispose()
-        }
-    }
-
-    override fun viewIntentStream(): Observable<ViewIntent> = viewIntentSubject
-        .doOnNext { intent ->
-            println("ZZZ emitting intent: $intent")
-        }
-
     private fun signalIntent(intent: ViewIntent) {
-        viewIntentSubject.onNext(intent)
+        viewModel?.signalIntent(intent)
     }
 
-    override fun render(viewState: ViewState) {
+    private fun render(viewState: ViewState) {
         println("ZZZ render viewstate: $viewState, previousViewState = $previousViewState")
 
         val didStopLoadingFirstPage = (previousViewState == ViewState.LoadingInitialCharacters &&
