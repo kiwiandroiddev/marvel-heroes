@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -94,6 +95,11 @@ class CharacterListFragment : Fragment(), CharacterListView {
     override fun onResume() {
         super.onResume()
         viewStateDisposable = presenter.attachView(this)
+        setActionBarTitle()
+    }
+
+    private fun setActionBarTitle() {
+        (activity as? AppCompatActivity)?.supportActionBar?.setTitle(R.string.character_list_screen_title)
     }
 
     override fun onPause() {

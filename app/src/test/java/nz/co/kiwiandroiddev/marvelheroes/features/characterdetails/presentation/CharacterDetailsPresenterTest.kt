@@ -14,7 +14,13 @@ import org.junit.Test
 class CharacterDetailsPresenterTest {
 
     companion object {
-        val SampleCharacterDetails1 = CharacterDetails(CharacterId(1), "Wolverine")
+        val SampleCharacterDetails1 = CharacterDetails(
+            id = CharacterId(1),
+            name = "Wolverine",
+            description = "Logan",
+            comicsAppearedIn = listOf("X-Men #001"),
+            imagePath = "http://marvel.com/wolverine.jpg"
+        )
     }
 
     lateinit var mockGetCharacterDetails: MockGetCharacterDetails

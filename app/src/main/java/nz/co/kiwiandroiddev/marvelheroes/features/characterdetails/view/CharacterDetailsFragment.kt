@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -91,7 +92,12 @@ class CharacterDetailsFragment : Fragment(), CharacterDetailsView {
     override fun onResume() {
         super.onResume()
         viewStateDisposable = presenter.attachView(this)
+        setActionBarTitle()
         signalIntent(ViewIntent.OnViewReady(getCharacterId()))
+    }
+
+    private fun setActionBarTitle() {
+        (activity as? AppCompatActivity)?.supportActionBar?.setTitle(R.string.character_details_screen_title)
     }
 
     private fun getCharacterId(): CharacterId {
@@ -125,6 +131,10 @@ class CharacterDetailsFragment : Fragment(), CharacterDetailsView {
                 }
                 is ViewState.Content -> buildCharacterDetailsModel(viewState.characterDetails)
             }
+        }
+
+        if (viewState !is ViewState.Loading) {
+            swipeRefreshLayout?.isRefreshing = false
         }
     }
 
