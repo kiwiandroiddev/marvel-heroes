@@ -24,7 +24,7 @@ import nz.co.kiwiandroiddev.marvelheroes.features.characterlist.presentation.Cha
 class CharacterListFragment : Fragment() {
 
     companion object {
-        private const val GridColumns = 2
+        private const val NumGridColumns = 2
     }
 
     private var viewModel: CharacterListViewModel? = null
@@ -56,7 +56,7 @@ class CharacterListFragment : Fragment() {
 
     private fun setupRecyclerView(context: Context) {
         epoxyRecyclerView?.apply {
-            layoutManager = GridLayoutManager(context, GridColumns)
+            layoutManager = GridLayoutManager(context, NumGridColumns)
 
             addOnScrollListener(object : OnScrolledToBottomListener() {
                 override fun onScrolledToBottom() {
@@ -128,7 +128,7 @@ class CharacterListFragment : Fragment() {
 
             if (viewState.showLoadingMoreIndicator()) {
                 inlineLoading {
-                    spanSizeOverride { _, _, _ -> GridColumns }
+                    spanSizeOverride { _, _, _ -> NumGridColumns }
                 }
             }
 
@@ -140,7 +140,7 @@ class CharacterListFragment : Fragment() {
         println("ZZZ in building loading model, prev view state = $previousViewState")
         if (previousViewState?.haveAnyCharacters() == false) {
             loading {
-                spanSizeOverride { _, _, _ -> GridColumns }
+                spanSizeOverride { _, _, _ -> NumGridColumns }
             }
         }
     }
@@ -151,7 +151,7 @@ class CharacterListFragment : Fragment() {
             onActionClickListener {
                 signalIntent(ViewIntent.OnRetryFromError)
             }
-            spanSizeOverride { _, _, _ -> GridColumns }
+            spanSizeOverride { _, _, _ -> NumGridColumns }
         }
     }
 
